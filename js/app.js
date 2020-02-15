@@ -1,16 +1,11 @@
-let valueSearch;
-let form;
-xhr = new XMLHttpRequest();
 
-valueSearch = document.getElementById('search');
-form = document.getElementById('formSearch');
-let resultSearch = document.getElementById('resultSearch');
+let xhr = new XMLHttpRequest();
 
-/*
+
+
 window.addEventListener('DOMContentLoaded',loadList);
 
 function loadList(event){
-
     xhr.open('GET','list.php',true);
     xhr.onload = function(){
         if(xhr.status == 200){
@@ -20,11 +15,20 @@ function loadList(event){
         }
     }
     xhr.send();
+}
 
-    
-}*/
 
+//PROCESO DE BUSQUEDA EN LA BARRA DE NAVEGACION
+
+let valueSearch;
+let form;
+let resultSearch = document.getElementById('resultSearch');
+valueSearch = document.getElementById('search');
+form = document.getElementById('formSearch');
 valueSearch.addEventListener('keyup', getValue);
+let list;
+list = document.createElement('ul');
+list.classList.add('collection');
 
 function getValue(event) {
 
@@ -36,28 +40,53 @@ function getValue(event) {
         xhr.onload = function () {
             if (xhr.status == 200) {
                 let resultSearch = JSON.parse(xhr.responseText);
+
                 for (const estudiante of resultSearch) {
                     resultados += `
-                    <div class="col s12">
-                        <div class="card horizontal">
-                            <div class="card-stacked">
-                                <div class="card-content">
-                                <p>${estudiante.nombres}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `
+                        <li class="collection-item">${estudiante.nombres}</li>
+                    `
                 }
+
+
+                list.innerHTML = resultados;
             } else {
                 console.log('Error')
             }
-            resultSearch.innerHTML = resultados;
+            resultSearch.appendChild(list);
+
         }
         xhr.send(valueInputSearch);
-    }else {
+    } else {
         resultSearch.innerHTML = ``;
     }
 
     event.preventDefault();
+}
+
+//PROCESO DE GUARDADO DE DATOS 
+
+let studentsForm;
+
+studentsForm = document.getElementById('studentsForm');
+
+studentsForm.addEventListener('submit',addStudent);
+
+function addStudent(event){
+    event.preventDefault();
+
+    xhr.open('POST','addStudent.php',true);
+    let data = new FormData(studentsForm);
+
+    xhr.onload = function(){
+        if(xhr.status == 200){
+            console.log(xhr.responseText)
+        }else {
+            console.log('desconexion exitosa :v')
+        }
+    }
+
+    xhr.send(data);
+    studentsForm.reset();
+    loadList();
+
 }
