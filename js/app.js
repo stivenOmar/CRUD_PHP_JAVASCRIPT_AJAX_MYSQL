@@ -4,9 +4,8 @@ let xhr = new XMLHttpRequest();
 
 //CARGAR LISTADO AL ABRIR LA PAGINA
 window.addEventListener('DOMContentLoaded',loadList);
-
+let tareas = document.getElementById('tareas');
 function loadList(event){
-    let tareas = document.getElementById('tareas');
     let row  =``;
     xhr.open('GET','list.php',true);
     xhr.onload = function(){
@@ -20,7 +19,7 @@ function loadList(event){
                         <td>${estudiante.nombres}</td>
                         <td>${estudiante.apellidos}</td>
                         <td>${estudiante.carrera}</td>
-                        <td class="red-text delete" style="cursor:pointer;"><i class="material-icons">delete_forever</i></td>
+                        <td class="red-text" style="cursor:pointer;"><i class="material-icons delete">delete_forever</i></td>
                     </tr>
                 `
             }
@@ -62,7 +61,7 @@ function getValue(event) {
                     `
                 }
 
-
+                loadList();
                 list.innerHTML = resultados;
             } else {
                 console.log('Error')
@@ -104,4 +103,28 @@ function addStudent(event){
     xhr.send(data);
     studentsForm.reset();
 
+}
+
+
+//PROCESO DE ELIMINACION
+tareas.addEventListener('click',deleteStudent);
+
+function deleteStudent(event){
+    if(event.target.classList.contains('delete')){
+        let idMat = parseInt(event.target.parentElement.parentElement.getAttribute('idMat'));
+        xhr.open('POST','deleteStudent.php', true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = function (){
+            if(xhr.status == 200){
+                console.log(xhr.responseText);
+                loadList();
+            }else {
+                console.log('conexion incorrecta');
+            }
+        }
+
+        xhr.send("idMat="+ idMat);
+
+        
+    }
 }
