@@ -6,7 +6,7 @@ if(isset($_POST['cedula'])){
     $nombres = $_POST['nombres'];
     $apellidos = $_POST['apellidos'];
     $carrera = $_POST['carrera'];
-
+    
     $query = "INSERT INTO lista_estudiantes (numMatricula , cedula , nombres , apellidos , carrera) 
         values (null,'$cedula','$nombres','$apellidos','$carrera')";
     

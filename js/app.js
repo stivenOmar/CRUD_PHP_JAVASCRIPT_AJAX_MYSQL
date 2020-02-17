@@ -19,7 +19,11 @@ function loadList(event){
                         <td>${estudiante.nombres}</td>
                         <td>${estudiante.apellidos}</td>
                         <td>${estudiante.carrera}</td>
-                        <td class="red-text" style="cursor:pointer;"><i class="material-icons delete">delete_forever</i></td>
+                        <td  style="cursor:pointer;">
+                        <i class="material-icons red-text delete">delete_forever</i>
+                        <i class="material-icons edit">edit</i>
+                        </td>
+                        
                     </tr>
                 `
             }
@@ -81,35 +85,51 @@ function getValue(event) {
 
 let studentsForm;
 
+//datos para accion editar
+let accion = "guardar";
 studentsForm = document.getElementById('studentsForm');
 
 studentsForm.addEventListener('submit',addStudent);
 
 function addStudent(event){
     event.preventDefault();
-
-    xhr.open('POST','addStudent.php',true);
     let data = new FormData(studentsForm);
-
-    xhr.onload = function(){
-        if(xhr.status == 200){
-            console.log(xhr.responseText)
-            loadList();
-        }else {
-            console.log('desconexion exitosa :v')
+    if(accion=="guardar"){
+        xhr.open('POST','addStudent.php',true);
+        xhr.onload = function(){
+            if(xhr.status == 200){
+                console.log(xhr.responseText)
+                loadList();
+            }else {
+                console.log('desconexion exitosa :v')
+            }
         }
-    }
 
-    xhr.send(data);
-    studentsForm.reset();
+        xhr.send(data);
+        studentsForm.reset();
+    }else {
+        xhr.open('POST','editStudent.php',true);
+        xhr.onload = function(){
+            if(xhr.status == 200){
+                console.log(xhr.responseText);
+                loadList();
+            }else {
+                console.log('edit desexitoso');
+            }
+        }
+
+        xhr.send(data);
+        studentsForm.reset();
+    }
+    
 
 }
 
-
-//PROCESO DE ELIMINACION
+//PROCESOS DE ELIMINACION Y EDICION DE ESTUDIANTE
 tareas.addEventListener('click',deleteStudent);
 
 function deleteStudent(event){
+    //PROCESO DE ELIMINACION
     if(event.target.classList.contains('delete')){
         let idMat = parseInt(event.target.parentElement.parentElement.getAttribute('idMat'));
         xhr.open('POST','deleteStudent.php', true);
@@ -127,4 +147,29 @@ function deleteStudent(event){
 
         
     }
+
+    //PROCESO DE EDICION
+    if(event.target.classList.contains('edit')){
+        let idMat = parseInt(event.target.parentElement.parentElement.getAttribute('idMat'));
+        
+        xhr.open('POST','editStudent.php', true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = function (){
+            if(xhr.status == 200){
+                let studentToEdit = JSON.parse(xhr.responseText);
+                document.getElementById('editIdMat').value = studentToEdit[0].idMat;
+                document.getElementById('cedula').value = studentToEdit[0].cedula;
+                document.getElementById('names').value = studentToEdit[0].nombres;
+                document.getElementById('apellidos').value = studentToEdit[0].apellidos;
+                document.getElementById('carrera').value = studentToEdit[0].carrera;
+                accion = 'editar';
+            }else {
+                console.log('conexion incorrecta');
+            }
+        }
+        cedula
+        xhr.send("idMat="+ idMat);
+    }
 }
+
+
